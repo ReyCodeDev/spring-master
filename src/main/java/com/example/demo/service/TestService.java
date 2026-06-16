@@ -37,6 +37,11 @@ public class TestService implements ITestService {
         return personMapper.personToPersonDTO(personRepository.findAll());
     }
 
+    @Override
+    public List<PersonDTO> getParents(Integer childId) {
+        return personMapper.personToPersonDTO(personRepository.findParentsByChildId(childId));
+    }
+
     public PersonDTO getPersonById(Integer id) {
         Optional<Person> personOptional = personRepository.findById(id);
         Person person = personOptional.orElseThrow(()-> new PersonNotFoundException("No se encuentra usuario con id " + id));

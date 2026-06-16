@@ -14,18 +14,18 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ParentChildren {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "parent_id", nullable = false)
     private Person parent;
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "child_id", nullable = false)
     private Person child;
 
+    @Id
     @Enumerated(EnumType.STRING)
     private ParentType type;
 }

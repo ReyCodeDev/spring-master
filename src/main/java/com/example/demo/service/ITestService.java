@@ -29,6 +29,12 @@ public interface ITestService {
     List<PersonDTO> getAllPeople();
 
     /**
+     *
+     * @return todos los usuarios, después de pasar por un mapper
+     */
+    List<PersonDTO> getParents(Integer childId);
+
+    /**
      * Devuelve un usuario, ojo, aqui se observa una clase que se llama Optional, esta clase controla nulos
      * @param id el id del usuario
      * @return el usuario por id

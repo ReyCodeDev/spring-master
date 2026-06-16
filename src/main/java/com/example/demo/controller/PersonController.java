@@ -50,6 +50,7 @@ public class PersonController {
      * @return Devuelve un JSON con todos los usuarios, este comportamiento es erroneo ya que se obtiene directamente
      * el objeto sin mappearlo a UN DTO (Data Transfer Object) asi que devuelve toda la información del usuario incluida
      * la sensible
+     * (Esto también puede hacer que se genere un JSON infinito si tiene relaciones, asi que ojo)
      */
     @GetMapping("/all-db")
     public ResponseEntity<List<Person>> getAllPeopleFromDB() {
@@ -69,7 +70,7 @@ public class PersonController {
      * @return devuelve un usuario por ID, solo un usuario
      */
     @GetMapping("by-id/{id}")
-    public ResponseEntity<PersonDTO> holaResponseEntity(@PathVariable Integer id){
+    public ResponseEntity<PersonDTO> getById(@PathVariable Integer id){
         return new ResponseEntity<>(testService.getPersonById(id), HttpStatus.OK);
     }
 
@@ -79,13 +80,18 @@ public class PersonController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("get-parents/{childId}")
+    public ResponseEntity<List<PersonDTO>> getParentsByChildId(@PathVariable Integer childId) {
+        return new ResponseEntity<>(testService.getParents(childId), HttpStatus.OK);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", Instant.now().toString());
         response.put("status", 400);
         response.put("error", "Bad Request");
-        response.put("path", request.getRequestURI()); // Captura la ruta dinámica automáticamente
+        response.put("path", request.getRequestURI());
         Map<String, String> detallesErrores = new HashMap<>();
 
         ex.getBindingResult().getAllErrors().forEach((error) -> {
