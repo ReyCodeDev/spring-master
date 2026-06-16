@@ -7,13 +7,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.jspecify.annotations.NullMarked;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "people")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@NullMarked
 public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,4 +23,10 @@ public class Person {
     private String name;
     private String email;
     private String dni;
+
+    @OneToMany(mappedBy = "parent")
+    private List<ParentChildren> childrenRelations;
+
+    @OneToMany(mappedBy = "child")
+    private List<ParentChildren> parentRelations;
 }
