@@ -1,25 +1,31 @@
 package com.example.demo.controller;
 
+import com.example.demo.api.PersonApi;
 import com.example.demo.dto.PersonDTO;
 import com.example.demo.dto.request.PersonRequestDTO;
 import com.example.demo.model.Person;
 import com.example.demo.service.ITestService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Implementa la interfaz {@link PersonApi}, generada a partir del contrato
+ * OpenAPI (src/main/resources/openapi/openapi.yaml). Los mapeos de ruta,
+ * @PathVariable, @RequestBody y @Valid viven en la interfaz generada; aquí solo
+ * está la lógica de cada endpoint.
+ */
 @RestController
-@RequestMapping("/")
-public class PersonController {
+public class PersonController implements PersonApi {
 
     final ITestService testService;
 
@@ -30,9 +36,9 @@ public class PersonController {
     /**
      * Hola mundo basico sobre la ruta localhost:8080/
      */
-    @GetMapping("/")
-    public String holaMundo() {
-        return "Hola mundo";
+    @Override
+    public ResponseEntity<String> holaMundo() {
+        return new ResponseEntity<>("Hola mundo", HttpStatus.OK);
     }
 
     /**
@@ -41,8 +47,8 @@ public class PersonController {
      * Llama a un servicio, que es la parte lógica de la aplicación
      * @return esta vez devuelve un ResponseEntity, que es basico en peticiones web en vez de string
      */
-    @GetMapping("/name/{name}")
-    public ResponseEntity<String> holaResponseEntity(@PathVariable String name){
+    @Override
+    public ResponseEntity<String> holaResponseEntity(String name){
         return new ResponseEntity<>(testService.getHolaMundo(name), HttpStatus.OK);
     }
 
@@ -52,7 +58,7 @@ public class PersonController {
      * la sensible
      * (Esto también puede hacer que se genere un JSON infinito si tiene relaciones, asi que ojo)
      */
-    @GetMapping("/all-db")
+    @Override
     public ResponseEntity<List<Person>> getAllPeopleFromDB() {
         return new ResponseEntity<>(testService.getAllPeopleBd(), HttpStatus.OK);
     }
@@ -60,7 +66,7 @@ public class PersonController {
     /**
      * @return Devuelve un JSON con todos los usuarios quitando el ID y el DNI (por ejemplo)
      */
-    @GetMapping("/all")
+    @Override
     public ResponseEntity<List<PersonDTO>> getAllPeople() {
         return new ResponseEntity<>(testService.getAllPeople(), HttpStatus.OK);
     }
@@ -69,19 +75,19 @@ public class PersonController {
     /**
      * @return devuelve un usuario por ID, solo un usuario
      */
-    @GetMapping("by-id/{id}")
-    public ResponseEntity<PersonDTO> getById(@PathVariable Integer id){
+    @Override
+    public ResponseEntity<PersonDTO> getById(Integer id){
         return new ResponseEntity<>(testService.getPersonById(id), HttpStatus.OK);
     }
 
-    @PostMapping("/")
-    public ResponseEntity<?> newUser(@Valid @RequestBody PersonRequestDTO personRequestDTO) {
+    @Override
+    public ResponseEntity<Void> newUser(PersonRequestDTO personRequestDTO) {
         testService.insertOne(personRequestDTO);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("get-parents/{childId}")
-    public ResponseEntity<List<PersonDTO>> getParentsByChildId(@PathVariable Integer childId) {
+    @Override
+    public ResponseEntity<List<PersonDTO>> getParentsByChildId(Integer childId) {
         return new ResponseEntity<>(testService.getParents(childId), HttpStatus.OK);
     }
 

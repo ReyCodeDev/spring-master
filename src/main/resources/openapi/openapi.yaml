@@ -1,0 +1,211 @@
+openapi: 3.0.3
+info:
+  title: Demo API
+  description: >-
+    API de ejemplo. El contrato es la fuente de verdad: las interfaces Java de
+    los controllers se generan a partir de este fichero con
+    openapi-generator-maven-plugin.
+  version: 0.0.1-SNAPSHOT
+servers:
+  - url: http://localhost:8080
+    description: Entorno local
+tags:
+  - name: person
+    description: Operaciones sobre personas
+
+paths:
+  /:
+    get:
+      tags: [person]
+      operationId: holaMundo
+      summary: Hola mundo básico
+      description: Devuelve un saludo simple en texto plano.
+      responses:
+        '200':
+          description: Saludo
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Hola mundo
+    post:
+      tags: [person]
+      operationId: newUser
+      summary: Crear una persona
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonRequestDTO'
+      responses:
+        '204':
+          description: Persona creada (sin contenido)
+        '400':
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /name/{name}:
+    get:
+      tags: [person]
+      operationId: holaResponseEntity
+      summary: Saludo personalizado
+      description: Devuelve "Hola {name}" usando un ResponseEntity.
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          example: adrian
+      responses:
+        '200':
+          description: Saludo personalizado
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Hola adrian
+
+  /all-db:
+    get:
+      tags: [person]
+      operationId: getAllPeopleFromDB
+      summary: Listar personas (entidad cruda)
+      description: >-
+        Devuelve las entidades Person directamente desde la base de datos sin
+        mapear a DTO. Expone información sensible; existe solo con fines
+        didácticos.
+      responses:
+        '200':
+          description: Lista de entidades Person
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+
+  /all:
+    get:
+      tags: [person]
+      operationId: getAllPeople
+      summary: Listar personas (DTO)
+      description: Devuelve todas las personas mapeadas a PersonDTO.
+      responses:
+        '200':
+          description: Lista de personas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PersonDTO'
+
+  /by-id/{id}:
+    get:
+      tags: [person]
+      operationId: getById
+      summary: Obtener una persona por id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 1
+      responses:
+        '200':
+          description: Persona encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDTO'
+        '404':
+          description: Persona no encontrada
+
+  /get-parents/{childId}:
+    get:
+      tags: [person]
+      operationId: getParentsByChildId
+      summary: Obtener los padres de una persona
+      parameters:
+        - name: childId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 1
+      responses:
+        '200':
+          description: Lista de padres
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PersonDTO'
+
+components:
+  schemas:
+    PersonDTO:
+      type: object
+      description: Vista pública de una persona.
+      properties:
+        name:
+          type: string
+          example: Adrian
+        email:
+          type: string
+          example: adrian@example.com
+
+    PersonRequestDTO:
+      type: object
+      description: Datos de entrada para crear una persona.
+      required: [name, dni]
+      properties:
+        name:
+          type: string
+          example: Adrian
+        email:
+          type: string
+          example: adrian@example.com
+        dni:
+          type: string
+          example: 12345678Z
+
+    Person:
+      type: object
+      description: Entidad de persona completa (uso interno).
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        email:
+          type: string
+        dni:
+          type: string
+
+    ValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        path:
+          type: string
+        errores:
+          type: object
+          additionalProperties:
+            type: string

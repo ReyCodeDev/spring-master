@@ -28,6 +28,8 @@
 	</scm>
 	<properties>
 		<java.version>26</java.version>
+		<openapi-generator.version>7.14.0</openapi-generator.version>
+		<springdoc.version>2.8.9</springdoc.version>
 	</properties>
 	<dependencies>
         <dependency>
@@ -61,6 +63,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>${springdoc.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>com.h2database</groupId>
@@ -86,6 +93,51 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.openapitools</groupId>
+				<artifactId>openapi-generator-maven-plugin</artifactId>
+				<version>${openapi-generator.version}</version>
+				<executions>
+					<execution>
+						<id>generate-person-api</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/openapi/openapi.yaml</inputSpec>
+							<generatorName>spring</generatorName>
+							<apiPackage>com.example.demo.api</apiPackage>
+							<modelPackage>com.example.demo.dto</modelPackage>
+							<generateApiTests>false</generateApiTests>
+							<generateApiDocumentation>false</generateApiDocumentation>
+							<generateModelTests>false</generateModelTests>
+							<generateModelDocumentation>false</generateModelDocumentation>
+							<generateSupportingFiles>false</generateSupportingFiles>
+							<!-- Reutilizamos los DTOs/entidades ya existentes en vez de generarlos.
+							     Formato correcto del plugin Maven: <schemaMapping>clave=valor</schemaMapping> -->
+							<schemaMappings>
+								<schemaMapping>PersonDTO=com.example.demo.dto.PersonDTO</schemaMapping>
+								<schemaMapping>PersonRequestDTO=com.example.demo.dto.request.PersonRequestDTO</schemaMapping>
+								<schemaMapping>Person=com.example.demo.model.Person</schemaMapping>
+							</schemaMappings>
+							<importMappings>
+								<importMapping>PersonDTO=com.example.demo.dto.PersonDTO</importMapping>
+								<importMapping>PersonRequestDTO=com.example.demo.dto.request.PersonRequestDTO</importMapping>
+								<importMapping>Person=com.example.demo.model.Person</importMapping>
+							</importMappings>
+							<configOptions>
+								<interfaceOnly>true</interfaceOnly>
+								<skipDefaultInterface>true</skipDefaultInterface>
+								<useSpringBoot3>true</useSpringBoot3>
+								<useTags>true</useTags>
+								<useResponseEntity>true</useResponseEntity>
+								<documentationProvider>none</documentationProvider>
+								<openApiNullable>false</openApiNullable>
+							</configOptions>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
