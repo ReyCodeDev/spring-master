@@ -114,6 +114,8 @@
 							<generateModelDocumentation>false</generateModelDocumentation>
 							<generateSupportingFiles>false</generateSupportingFiles>
 							<!-- Reutilizamos los DTOs/entidades ya existentes en vez de generarlos.
+								 A fin de poder tenerlos personalizados en caso de (Por ejemplo tenerlos en record
+								 y asi ver que es un record)
 							     Formato correcto del plugin Maven: <schemaMapping>clave=valor</schemaMapping> -->
 							<schemaMappings>
 								<schemaMapping>PersonDTO=com.example.demo.dto.PersonDTO</schemaMapping>
